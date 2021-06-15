@@ -1,5 +1,5 @@
 import { join } from "path";
-import { publicDir, spinner, TaskManager, wait, write } from "../../util";
+import { publicDir, TaskManager, wait, write } from "../../util";
 import { Browser } from "puppeteer";
 import { Presets, SingleBar } from "cli-progress";
 import { BasicInfo, Game } from "../../types";
@@ -43,7 +43,7 @@ export default async function (browser: Browser) {
   const manager = new TaskManager(5);
   const _basicInfo: BasicInfo[] = [];
 
-  const { stop } = spinner("[nintendo/en-(gb+us)] Fetching game urls...");
+  console.log("[nintendo/en-(gb+us)] Fetching game urls...");
 
   for (const genre of genreFilters) {
     for (const price of priceFilters) {
@@ -89,8 +89,6 @@ export default async function (browser: Browser) {
   await manager.runAll();
   const basicInfo = [...new Set(_basicInfo)];
   await write(json, { basicInfo });
-  stop();
-
   const games: Game[] = [];
   const bar = new SingleBar(
     { format: "[nintendo/en-(gb+us)] [{bar}] {percentage}% ({value}/{total}) | ETA {eta_formatted}", etaBuffer: 100 },

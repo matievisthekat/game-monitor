@@ -2,11 +2,11 @@ import { SingleBar, Presets } from "cli-progress";
 import { join } from "path";
 import { Browser, Page } from "puppeteer";
 import { BasicInfo, Game, Locale } from "../../types";
-import { publicDir, spinner, TaskManager, wait, write } from "../../util";
+import { publicDir, TaskManager, wait, write } from "../../util";
 
 export default async function (browser: Browser, locale: Locale) {
   const json = join(publicDir, `xbox/${locale}.json`);
-  const { stop } = spinner(`[xbox/${locale}] Fetching game urls...`);
+  console.log(`[xbox/${locale}] Fetching game urls...`);
 
   const page = await browser.newPage();
   await page.goto(`https://www.xbox.com/${locale}/games/all-games?cat=all`);
@@ -67,8 +67,6 @@ export default async function (browser: Browser, locale: Locale) {
   }
 
   await page.close();
-  stop();
-
   const manager = new TaskManager(5);
   const basicInfo = [...new Set(_basicInfo)];
   await write(json, { basicInfo });

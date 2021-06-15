@@ -1,6 +1,5 @@
 import { readJSON, writeJSON } from "fs-extra";
 import { resolve, join } from "path";
-import updateLog from "log-update";
 import { BasicInfo, JsonFile, Locale, Site } from "./types";
 
 export const publicDir = resolve("src", "public");
@@ -55,23 +54,6 @@ export function toProperCase(s: string) {
     .split(/ +/g)
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1, w.length))
     .join(" ");
-}
-
-export function spinner(title: string) {
-  const frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
-  let i = 0;
-
-  const interval = setInterval(() => {
-    const frame = frames[(i = ++i % frames.length)];
-    updateLog(`${frame} ${title}`);
-  }, 80);
-
-  return {
-    stop: () => {
-      clearInterval(interval);
-      updateLog.clear();
-    },
-  };
 }
 
 export function wait(t: number) {

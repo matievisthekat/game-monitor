@@ -1,5 +1,5 @@
 import { join } from "path";
-import { publicDir, spinner, TaskManager, write } from "../../util";
+import { publicDir, TaskManager, write } from "../../util";
 import { Browser, Page } from "puppeteer";
 import { BasicInfo, Game } from "../../types";
 import { Presets, SingleBar } from "cli-progress";
@@ -13,7 +13,7 @@ export default async function (browser: Browser) {
   const manager = new TaskManager(10);
   const _basicInfo: BasicInfo[] = [];
 
-  const { stop } = spinner("[nintendo/ja-jp] Fetching game urls...");
+  console.log("[nintendo/ja-jp] Fetching game urls...");
 
   await page.goto(url);
   await page.waitForSelector("li.nc3-as-result__listItem.nc3-l-grid__cell.is-shown.is-visible");
@@ -56,8 +56,6 @@ export default async function (browser: Browser) {
   await manager.runAll();
   const basicInfo = [...new Set(_basicInfo)];
   await write(json, { basicInfo });
-  stop();
-
   const games: Game[] = [];
   const bar = new SingleBar(
     { format: "[nintendo/ja-jp] [{bar}] {percentage}% ({value}/{total}) | ETA {eta_formatted}", etaBuffer: 100 },

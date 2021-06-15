@@ -2,11 +2,11 @@ import { Presets, SingleBar } from "cli-progress";
 import { join } from "path";
 import { Browser } from "puppeteer";
 import { BasicInfo, Game, Locale } from "../../types";
-import { publicDir, spinner, TaskManager, wait, write } from "../../util";
+import { publicDir, TaskManager, wait, write } from "../../util";
 
 export default async function (browser: Browser, locale: Locale) {
   const json = join(publicDir, `playstation/${locale}.json`);
-  const { stop } = spinner("[playstation.gb] Fetching game urls...");
+  console.log("[playstation.gb] Fetching game urls...");
 
   const page = await browser.newPage();
   await page.goto(`https://store.playstation.com/${locale}/collections`);
@@ -65,7 +65,6 @@ export default async function (browser: Browser, locale: Locale) {
   }
 
   await manager.runAll();
-  stop();
   const basicInfo = [...new Set(_basicInfo)];
   await write(json, { basicInfo });
 
