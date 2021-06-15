@@ -13,7 +13,7 @@ export default async function (browser: Browser, locale: Locale) {
 
   const handlePopup = async (page: Page) => {
     if (await page.$("div#srInvBody").catch(() => {})) {
-      await page.click("img#closeBtn").catch(() => {});
+      await page.click("img#closeBtn").catch((e) => console.log("\n", "img#closeBtn failed to click", e));
       await wait(1000);
     }
   };
@@ -23,14 +23,15 @@ export default async function (browser: Browser, locale: Locale) {
 
   await handlePopup(page);
   await page.waitForSelector(sortListButton);
-  await wait(1000);
+  await page.hover(sortListButton);
   await page.click(sortListButton);
-  await wait(500);
 
   await page.waitForSelector('li[id$="-select-menu-2"]');
+  await wait(1000);
+  await page.hover('li[id$="-select-menu-2"]');
   await page.click('li[id$="-select-menu-2"]');
 
-  await page.waitForSelector("div.m-product-placement-item.context-game.gameDiv");
+  await page.waitForSelector("div.m-product-placement-item.context-game.gameDiv", { timeout: 0 });
   await wait(5000);
 
   const pageinateButton = "section.paginateDropdown > div > div.c-select-menu.f-persist > button";
@@ -57,7 +58,7 @@ export default async function (browser: Browser, locale: Locale) {
 
       const next = await page.$("li.paginatenext");
       if (next) {
-        await next.evaluate((e) => e.scrollTo());
+        await next.hover();
         await next.click().catch(() => (plsBreak = true));
         await wait(500);
       } else plsBreak = true;
@@ -82,16 +83,16 @@ export default async function (browser: Browser, locale: Locale) {
       const page = await browser.newPage();
       const game: Game = { url, name, availability: "unavailable", img };
 
-      await page.goto(url, { timeout: 0 }).catch((e) => console.log(`${url} ${e}`));
+      await page.goto(url, { timeout: 0 }).catch((e) => console.log(`\n${url} ${e}`));
 
       if (url.includes("microsoft")) {
         if (page.url().startsWith(url)) {
-          await page.waitForSelector("div#productTitle > * > *").catch((e) => console.log(`${url} ${e}`));
+          await page.waitForSelector("div#productTitle > * > *").catch((e) => console.log(`\n${url} ${e}`));
 
           game.availability = (await page.$("button#buttonPanel_AppIdentityBuyButton")) ? "available" : "unavailable";
         }
       } else {
-        await page.waitForSelector("a.c-call-to-action.c-glyph").catch((e) => console.log(`${url} ${e}`));
+        await page.waitForSelector("a.c-call-to-action.c-glyph").catch((e) => console.log(`\n${url} ${e}`));
 
         game.availability = (await page.$("a.c-call-to-action.c-glyph")) ? "available" : "unavailable";
       }
