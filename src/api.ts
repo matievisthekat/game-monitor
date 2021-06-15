@@ -1,7 +1,7 @@
 import express from "express";
-import { compareTwoStrings } from "string-similarity";
+import { go } from "fuzzysort";
 import { BasicInfo, BasicInfoSearch, JsonFile, Locale, Site } from "./types";
-import { checkSiteAndLocale, getALlJson, getJson } from "./util";
+import { checkSiteAndLocale, getALlJson, getJson, removeDuplicates } from "./util";
 
 const app = express();
 const port = 3000;
@@ -24,7 +24,7 @@ app.get("/:site/:locale", async (req, res) => {
 });
 
 app.get("/search", async (req, res) => {
-  const { _site, _locale, _q } = req.query;
+  const { site: _site, locale: _locale, q: _q } = req.query;
 
   const site = Array.isArray(_site) ? _site.join(" ") : (_site as string);
   const locale = Array.isArray(_locale) ? _locale.join(" ") : (_locale as string);
@@ -35,7 +35,7 @@ app.get("/search", async (req, res) => {
   const error = checkSiteAndLocale(site, locale);
   if (error) return res.status(400).json({ error });
 
-  const games: BasicInfo[] = [];
+  const _games: BasicInfo[] = [];
 
   if (site && !locale) {
     let com: JsonFile = { games: [] };
@@ -51,27 +51,30 @@ app.get("/search", async (req, res) => {
       us = await getJson(site as Site, "en-us");
     }
 
-    games.push(...jp.games.concat(com.games, gb.games, us.games));
+    _games.push(...jp.games.concat(com.games, gb.games, us.games));
   } else if (!site && locale) {
     const xbox = await getJson("xbox", locale as Locale);
     const playstation = await getJson("playstation", locale as Locale);
     const nintendo = await getJson("nintendo", locale as Locale);
 
-    games.push(...xbox.games.concat(playstation.games, nintendo.games));
+    _games.push(...xbox.games.concat(playstation.games, nintendo.games));
   } else if (site && locale) {
-    games.push(...(await getJson(site as Site, locale as Locale)).games);
+    _games.push(...(await getJson(site as Site, locale as Locale)).games);
   } else {
-    games.push(...(await getALlJson()).games);
+    _games.push(...(await getALlJson()).games);
   }
 
-  const searchedGames: BasicInfoSearch[] = [];
-  for (const game of games) {
-    const similarity = compareTwoStrings(q, game.name);
-    searchedGames.push(Object.assign({ similarity }, game));
-  }
+  const games = removeDuplicates(_games.filter((g) => g));
+  const results = go(
+    q,
+    games.map((g) => g.name)
+  )
+    .concat([])
+    .sort((a, b) => b.score - a.score);
 
-  const sortedSearchedGames = searchedGames.sort((a, b) => b.similarity - a.similarity);
-  res.status(200).json(sortedSearchedGames);
+  res
+    .status(200)
+    .json(results.map((r) => Object.assign(games.find((g) => g.name === r.target) as BasicInfo, { score: r.score })));
 });
 
 app.listen(port, () => console.log(`[api] Listening on port ${port}`));

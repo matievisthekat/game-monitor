@@ -1,9 +1,13 @@
 import { readJSON, writeJSON } from "fs-extra";
 import { resolve, join } from "path";
 import updateLog from "log-update";
-import { JsonFile, Locale, Site } from "./types";
+import { BasicInfo, JsonFile, Locale, Site } from "./types";
 
 export const publicDir = resolve("src", "public");
+
+export function removeDuplicates(games: BasicInfo[]) {
+  return games.filter((v, i) => games.indexOf(v) === i);
+}
 
 export function checkSiteAndLocale(site?: string, locale?: string) {
   if (locale && !["en-gb", "en-us", "ja-jp"].includes(locale)) return "Invalid 'locale' param";
