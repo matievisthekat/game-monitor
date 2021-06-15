@@ -37,7 +37,8 @@ export default async function (browser: Browser, locale: Locale) {
   const pageinateButton = "section.paginateDropdown > div > div.c-select-menu.f-persist > button";
   await page.hover(pageinateButton);
   await page.click(pageinateButton);
-  await wait(1000);
+
+  await page.waitForSelector("section.paginateDropdown > div > div > ul > li[id$='-select-menu-3'] > span");
   await page.hover("section.paginateDropdown > div > div > ul > li[id$='-select-menu-3'] > span");
   await page.click("section.paginateDropdown > div > div > ul > li[id$='-select-menu-3'] > span");
 
@@ -58,7 +59,7 @@ export default async function (browser: Browser, locale: Locale) {
 
       const next = await page.$("li.paginatenext");
       if (next) {
-        await next.hover();
+        await next.evaluate((e) => e?.scrollTo());
         await next.click().catch(() => (plsBreak = true));
         await wait(500);
       } else plsBreak = true;

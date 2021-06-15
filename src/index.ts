@@ -8,14 +8,15 @@ import xbox from "./sites/xbox/index";
 import playstation from "./sites/playstation/index";
 
 import { publicDir, TaskManager } from "./util";
+import "./api";
 
 const width = 1024;
-const height = 600;
+const height = 6000;
 
 launch({
   headless: true,
   defaultViewport: { width, height },
-  args: ["--proxy-server=vps.matievisthekat.dev:3128"],
+  // args: ["--proxy-server=vps.matievisthekat.dev:3128"],
 }).then(async (browser) => {
   const tasks = new TaskManager(3);
 
