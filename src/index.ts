@@ -4,12 +4,8 @@ import { resolve, join } from "path";
 
 import nintendoCom from "./sites/nintendo/com";
 import nintendoJp from "./sites/nintendo/co.jp";
-
 import xbox from "./sites/xbox/index";
-
-import playstationGb from "./sites/playstation/gb";
-import playstationUs from "./sites/playstation/us";
-import playstationJp from "./sites/playstation/jp";
+import playstation from "./sites/playstation/index";
 
 import { publicDir, TaskManager } from "./util";
 
@@ -41,9 +37,9 @@ launch({
     .addTask(async () => await xbox(browser, "en-us"))
     .addTask(async () => await xbox(browser, "ja-jp"))
 
-    // .addTask(async () => await playstationGb(browser))
-    // .addTask(async () => await playstationUs(browser))
-    // .addTask(async () => await playstationJp(browser))
+    // .addTask(async () => await playstation(browser, "en-gb"))
+    // .addTask(async () => await playstation(browser, "en-us"))
+    // .addTask(async () => await playstation(browser, "ja-jp"))
     .runAll();
 
   await browser.close();

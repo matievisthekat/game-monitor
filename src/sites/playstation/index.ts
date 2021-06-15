@@ -1,16 +1,15 @@
-import { SingleBar, Presets } from "cli-progress";
-import { resolve } from "path";
+import { Presets, SingleBar } from "cli-progress";
+import { join } from "path";
 import { Browser } from "puppeteer";
-import { BasicInfo, Game } from "../../types";
-import { spinner, TaskManager, wait, write } from "../../util";
+import { BasicInfo, Game, Locale } from "../../types";
+import { publicDir, spinner, TaskManager, wait, write } from "../../util";
 
-const json = resolve("playstation.jp.json");
-
-export default async function (browser: Browser) {
-  const { stop } = spinner("[playstation.jp] Fetching game urls...");
+export default async function (browser: Browser, locale: Locale) {
+  const json = join(publicDir, `playstation/${locale}.json`);
+  const { stop } = spinner("[playstation.gb] Fetching game urls...");
 
   const page = await browser.newPage();
-  await page.goto("https://store.playstation.com/ja-jp/collections");
+  await page.goto(`https://store.playstation.com/${locale}/collections`);
 
   await page.waitForSelector("h2#title-bbc9be0f-fe39-11ea-aadc-062143ad1e8d");
 
@@ -72,7 +71,7 @@ export default async function (browser: Browser) {
 
   const games: Game[] = [];
   const bar = new SingleBar(
-    { format: "[playstation.jp] [{bar}] {percentage}% ({value}/{total}) | ETA {eta_formatted}", etaBuffer: 100 },
+    { format: `[playstation/${locale}] [{bar}] {percentage}% ({value}/{total}) | ETA {eta_formatted}`, etaBuffer: 100 },
     Presets.shades_classic
   );
 
@@ -85,7 +84,7 @@ export default async function (browser: Browser) {
       await page.goto(url);
       await page
         .waitForSelector('span.psw-h3[data-qa="mfeCtaMain#offer0#finalPrice"]')
-        .catch(() => (availability = "unavailable"));
+        .catch((e) => (availability = "unavailable"));
       await page.waitForSelector("h1.psw-m-b-xs").catch((e) => console.log(`${url} ${e}`));
 
       availability = await page
@@ -102,5 +101,5 @@ export default async function (browser: Browser) {
 
   await manager.runAll();
   await write(json, { games });
-  console.log("\n[playstation.jp] Done");
+  console.log(`\n[playstation/${locale}] Done`);
 }
