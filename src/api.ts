@@ -1,29 +1,30 @@
 import express from "express";
 import { go } from "fuzzysort";
-import { BasicInfo, BasicInfoSearch, JsonFile, Locale, Site } from "./types";
-import { checkSiteAndLocale, getALlJson, getJson, removeDuplicates } from "./util";
+import { BasicInfo, JsonFile, Locale, Site } from "./types";
+import { checkSiteAndLocale, getALlJson, getJson, publicDir, removeDuplicates } from "./util";
 
 const app = express();
-const port = 3000;
+const port = 3001;
 
 app.set("json spaces", 2);
+app.use(express.static(publicDir));
 
-app.get("/", async (req, res) => {
+app.get("/api", async (req, res) => {
   const all = await getALlJson();
   res.status(200).json({ amount: all.games.length });
 });
 
-app.get("/:site/:locale", async (req, res) => {
-  const { site, locale } = req.params;
+// app.get("/api/:site/:locale", async (req, res) => {
+//   const { site, locale } = req.params;
 
-  const error = checkSiteAndLocale(site, locale);
-  if (error) return res.status(400).json({ error });
+//   const error = checkSiteAndLocale(site, locale);
+//   if (error) return res.status(400).json({ error });
 
-  const data = await getJson(site as Site, locale as Locale);
-  res.status(200).json(data);
-});
+//   const data = await getJson(site as Site, locale as Locale);
+//   res.status(200).json(data);
+// });
 
-app.get("/search", async (req, res) => {
+app.get("/api/search", async (req, res) => {
   const { site: _site, locale: _locale, q: _q } = req.query;
 
   const site = Array.isArray(_site) ? _site.join(" ") : (_site as string);
@@ -64,11 +65,10 @@ app.get("/search", async (req, res) => {
     _games.push(...(await getALlJson()).games);
   }
 
-  const games = removeDuplicates(_games.filter((g) => g));
-  const results = go(
-    q,
-    games.map((g) => g.name)
-  )
+  const _gamesClean = _games.filter((g) => !!g);
+  const games = removeDuplicates(_gamesClean);
+  const names = games.map((g) => g.name);
+  const results = go(q, [...new Set(names)])
     .concat([])
     .sort((a, b) => b.score - a.score);
 

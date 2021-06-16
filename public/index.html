@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game Monitor</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet" />
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet" />
+  </head>
+  <body class="bg-gray-300">
+    <main class="p-5 m-auto container">
+      <form id="form" class="text-center">
+        <input type="text" id="q" class="block mx-auto mt-4 p-1 rounded shadow-lg" />
+        <select id="site" class="inline-block mx-1 my-4 p-1 rounded shadow-lg bg-white w-100">
+          <option>any</option>
+          <option>nintendo</option>
+          <option>xbox</option>
+          <option>playstation</option>
+        </select>
+        <select id="locale" class="inline-block mx-1 my-4 p-1 rounded shadow-lg bg-white w-100">
+          <option>any</option>
+          <option>en-gb</option>
+          <option>en-us</option>
+          <option>ja-jp</option>
+        </select>
+        <button type="submit" class="block rounded bg-green-400 p-2 mt-4 shadow-lg mx-auto">Search</button>
+        <span id="error" class="block mt-4 text-red-500"></span>
+        <span id="loading" class="block mt-4 text-blue-500"></span>
+      </form>
+
+      <div id="results" class="p-3 mx-auto mt-5 text-center grid grid-cols-1 md:grid-cols-6 grid-rows-auto"></div>
+    </main>
+
+    <script>
+      const form = document.querySelector("#form");
+      const error = document.querySelector("#error");
+      const loading = document.querySelector("#loading");
+      const results = document.querySelector("#results");
+      const q = document.querySelector("#q");
+      const site = document.querySelector("#site");
+      const locale = document.querySelector("#locale");
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        loading.textContent = "";
+
+        if (!q.value) {
+          error.textContent = "Please provide a search query";
+        } else {
+          error.textContent = "";
+          loading.textContent = "Fetching games...";
+
+          fetch(
+            `/api/search?q=${q.value}${site.value !== "any" ? `&site=${site.value}` : ""}${
+              locale.value !== "any" ? `&locale=${locale.value}` : ""
+            }`
+          )
+            .then(async (res) => {
+              const data = await res.json();
+              loading.textContent = "";
+
+              if (res.status === 200) {
+                results.innerHTML = "";
+
+                for (const game of data) {
+                  results.innerHTML += `
+                    <a href="${game.url}" target="_blank">
+                      <div class="shadow-xl rounded bg-gray-400 m-3 pb-1 max-h-100 max-w-50 row-span-1 col-span-1 overflow-auto">
+                        <img class="h-30 mb-1 mx-auto" src="${game.img}" />
+                        <h3>${game.name}</h3>
+                        <span class="text-sm text-blue-600">${game.availability}</span>
+                      </div>
+                    </a>
+                  `;
+                }
+              } else {
+                error.textContent = "Request failed";
+              }
+            })
+            .catch((err) => {
+              loading.textContent = "";
+              console.log(err);
+            });
+        }
+      });
+
+      function removeDuplicates(arr) {
+        const urls = arr.map((g) => g.url);
+        return urls.filter((v, i) => urls.indexOf(v) === i).map((u) => arr.find((g) => g.url === u));
+      }
+    </script>
+  </body>
+</html>
