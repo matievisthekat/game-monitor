@@ -15,9 +15,9 @@ export default async function (browser: Browser) {
 
   console.log("[nintendo/ja-jp] Fetching game urls...");
 
-  await page.goto(url);
-  await page.waitForSelector("li.nc3-as-result__listItem.nc3-l-grid__cell.is-shown.is-visible");
-  await page.waitForSelector("div.nc3-js-scrollbar__content > div.nc3-js-scrollbar__content");
+  await page.goto(url, { timeout: 120000 });
+  await page.waitForSelector("li.nc3-as-result__listItem.nc3-l-grid__cell.is-shown.is-visible", { visible: true });
+  await page.waitForSelector("div.nc3-js-scrollbar__content > div.nc3-js-scrollbar__content", { visible: true });
 
   const pages = await page.$$(
     "div.nc3-js-scrollbar__content > div.nc3-js-scrollbar__content > ul.nc3-c-pagination__list > li"
@@ -45,8 +45,8 @@ export default async function (browser: Browser) {
       const tmp = await browser.newPage();
       await tmp.goto(url);
 
-      await tmp.goto(`${url}&spage=${i}`, { timeout: 0 });
-      await tmp.waitForSelector("li.nc3-as-result__listItem.nc3-l-grid__cell.is-shown.is-visible");
+      await tmp.goto(`${url}&spage=${i}`, { timeout: 120000 });
+      await tmp.waitForSelector("li.nc3-as-result__listItem.nc3-l-grid__cell.is-shown.is-visible", { visible: true });
 
       await getPageGames(tmp);
       await tmp.close();
@@ -67,12 +67,12 @@ export default async function (browser: Browser) {
     manager.addTask(() => {
       return new Promise<void>(async (resolve) => {
         const page = await browser.newPage();
-        await page.goto(url, { timeout: 0 }).catch((e) => console.log("\n", url, e));
+        await page.goto(url, { timeout: 120000 }).catch((e) => console.log("\n", url, e));
 
         page
-          .waitForSelector("h1.productDetail--headline__title")
+          .waitForSelector("h1.productDetail--headline__title", { visible: true })
           .then(async () => {
-            await page.waitForSelector("a.productDetail--buttons__button--primary");
+            await page.waitForSelector("a.productDetail--buttons__button--primary", { visible: true });
 
             const availability =
               (await page

@@ -2,10 +2,11 @@ import { readJSON, writeJSON } from "fs-extra";
 import { resolve, join } from "path";
 import { BasicInfo, JsonFile, Locale, Site } from "./types";
 
-export const publicDir = resolve("src", "public");
+export const publicDir = resolve("public");
 
 export function removeDuplicates(games: BasicInfo[]) {
-  return games.filter((v, i) => games.indexOf(v) === i);
+  const urls = games.map((g) => g.url);
+  return urls.filter((v, i) => urls.indexOf(v) === i).map((u) => games.find((g) => g.url === u) as BasicInfo);
 }
 
 export function checkSiteAndLocale(site?: string, locale?: string) {

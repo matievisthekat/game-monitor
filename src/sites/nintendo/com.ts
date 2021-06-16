@@ -50,7 +50,7 @@ export default async function (browser: Browser) {
       manager.addTask(() => {
         return new Promise<void>(async (resolve) => {
           const page = await browser.newPage();
-          await page.goto(`${url}&dFR[genres][0]=${genre}&dFR[priceRange][0]=${price}`, { timeout: 0 });
+          await page.goto(`${url}&dFR[genres][0]=${genre}&dFR[priceRange][0]=${price}`, { timeout: 120000 });
 
           const sel = "styled-button#btn-load-more > span";
           let plsBreak = false;
@@ -102,7 +102,7 @@ export default async function (browser: Browser) {
     manager.addTask(() => {
       return new Promise<void>(async (resolve) => {
         const page = await browser.newPage();
-        await page.goto(url, { timeout: 0 });
+        await page.goto(url, { timeout: 120000 });
 
         const end = async (availability?: string | void | null) => {
           games.push({ name, url, availability: availability || "unavailable", img });
@@ -119,7 +119,7 @@ export default async function (browser: Browser) {
         });
 
         page
-          .waitForSelector("div.buy-digital > a > styled-button")
+          .waitForSelector("div.buy-digital > a > styled-button", { visible: true })
           .then(async () => {
             const buttonVisible = await page.$eval(
               "a.digital-purchase.buy-now-link",

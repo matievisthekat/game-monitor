@@ -9,7 +9,7 @@ export default async function (browser: Browser, locale: Locale) {
   console.log(`[xbox/${locale}] Fetching game urls...`);
 
   const page = await browser.newPage();
-  await page.goto(`https://www.xbox.com/${locale}/games/all-games?cat=all`);
+  await page.goto(`https://www.xbox.com/${locale}/games/all-games?cat=all`, { timeout: 120000 });
 
   const handlePopup = async (page: Page) => {
     if (await page.$("div#srInvBody").catch(() => {})) {
@@ -18,29 +18,30 @@ export default async function (browser: Browser, locale: Locale) {
     }
   };
 
+  await handlePopup(page);
+  await page.waitForSelector("div.m-product-placement-item.context-game.gameDiv", { timeout: 0 });
+
   const sortListButton =
     "section.select-menu.live-area.sort-area.x-visible-inline-block.gameSort.generalSort > div.c-select div.c-select-menu.f-persist > button";
-
-  await handlePopup(page);
-  await page.waitForSelector(sortListButton);
+  await page.waitForSelector(sortListButton, { visible: true });
   await page.hover(sortListButton);
   await page.click(sortListButton);
 
-  await page.waitForSelector('li[id$="-select-menu-2"]');
+  await page.waitForSelector('li[id$="-select-menu-2"]', { visible: true });
   await wait(1000);
   await page.hover('li[id$="-select-menu-2"]');
   await page.click('li[id$="-select-menu-2"]');
 
-  await page.waitForSelector("div.m-product-placement-item.context-game.gameDiv", { timeout: 0 });
-  await wait(5000);
+  const paginateButton = "section.paginateDropdown > div > div > button";
+  await page.hover(paginateButton);
+  await page.click(paginateButton);
 
-  const pageinateButton = "section.paginateDropdown > div > div.c-select-menu.f-persist > button";
-  await page.hover(pageinateButton);
-  await page.click(pageinateButton);
+  const paginateLi = "section.paginateDropdown > div > div > ul > li[id$='-select-menu-3'] > span";
+  await page.waitForSelector(paginateLi);
+  await page.hover(paginateLi);
+  await page.click(paginateLi);
 
-  await page.waitForSelector("section.paginateDropdown > div > div > ul > li[id$='-select-menu-3'] > span");
-  await page.hover("section.paginateDropdown > div > div > ul > li[id$='-select-menu-3'] > span");
-  await page.click("section.paginateDropdown > div > div > ul > li[id$='-select-menu-3'] > span");
+  await page.waitForSelector("div.m-product-placement-item.context-game.gameDiv", { timeout: 0, visible: true });
 
   const _basicInfo: BasicInfo[] = [];
   let plsBreak = false;
@@ -82,7 +83,7 @@ export default async function (browser: Browser, locale: Locale) {
       const page = await browser.newPage();
       const game: Game = { url, name, availability: "unavailable", img };
 
-      await page.goto(url, { timeout: 0 }).catch((e) => console.log(`\n${url} ${e}`));
+      await page.goto(url, { timeout: 120000 }).catch((e) => console.log(`\n${url} ${e}`));
 
       if (url.includes("microsoft")) {
         if (page.url().startsWith(url)) {
@@ -91,6 +92,12 @@ export default async function (browser: Browser, locale: Locale) {
           game.availability = (await page.$("button#buttonPanel_AppIdentityBuyButton")) ? "available" : "unavailable";
         }
       } else {
+        const over18 = await page.$("div#over18 > a");
+        if (over18) {
+          await over18.hover();
+          await over18.click();
+        }
+
         await page.waitForSelector("a.c-call-to-action.c-glyph").catch((e) => console.log(`\n${url} ${e}`));
 
         game.availability = (await page.$("a.c-call-to-action.c-glyph")) ? "available" : "unavailable";
