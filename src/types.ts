@@ -19,5 +19,5 @@ export interface BasicInfoSearch extends BasicInfo {
 }
 
 export interface JsonFile {
-  games: BasicInfo[];
+  games: Game[];
 }
