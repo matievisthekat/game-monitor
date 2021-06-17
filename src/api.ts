@@ -11,18 +11,8 @@ app.use(express.static(publicDir));
 
 app.get("/api", async (req, res) => {
   const all = await getALlJson();
-  res.status(200).json({ amount: all.games.length });
+  res.status(200).json({ amount: all.games.length, games: all.games });
 });
-
-// app.get("/api/:site/:locale", async (req, res) => {
-//   const { site, locale } = req.params;
-
-//   const error = checkSiteAndLocale(site, locale);
-//   if (error) return res.status(400).json({ error });
-
-//   const data = await getJson(site as Site, locale as Locale);
-//   res.status(200).json(data);
-// });
 
 app.get("/api/search", async (req, res) => {
   const { site: _site, locale: _locale, q: _q } = req.query;
