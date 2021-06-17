@@ -31,12 +31,12 @@ launch({
   tasks.setLimit(1);
 
   await tasks
-    // .addTask(async () => await nintendoJp(browser))
-    // .addTask(async () => await nintendoCom(browser))
+    .addTask(async () => await nintendoJp(browser))
+    .addTask(async () => await nintendoCom(browser))
 
-    // .addTask(async () => await xbox(browser, "en-gb"))
-    // .addTask(async () => await xbox(browser, "en-us"))
-    // .addTask(async () => await xbox(browser, "ja-jp"))
+    .addTask(async () => await xbox(browser, "en-gb"))
+    .addTask(async () => await xbox(browser, "en-us"))
+    .addTask(async () => await xbox(browser, "ja-jp"))
 
     .addTask(async () => await playstation(browser, "en-gb"))
     .addTask(async () => await playstation(browser, "en-us"))
