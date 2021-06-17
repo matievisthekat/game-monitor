@@ -4,7 +4,7 @@ import { BasicInfo, JsonFile, Locale, Site } from "./types";
 import { checkSiteAndLocale, getALlJson, getJson, publicDir, removeDuplicates } from "./util";
 
 const app = express();
-const port = 3001;
+const port = 80;
 
 app.set("json spaces", 2);
 app.use(express.static(publicDir));
@@ -17,7 +17,8 @@ app.get("/api", async (req, res) => {
 app.get("/api/unavailable", async (req, res) => {
   const all = await getALlJson();
   const unavailable = all.games.filter(
-    (g) => g.availability === "unavailable" || !["購入にすすむ", "無料ダウンロード", "available"].includes(g.availability)
+    (g) =>
+      g.availability === "unavailable" || !["購入にすすむ", "無料ダウンロード", "available"].includes(g.availability)
   );
   res.status(200).json({ amount: unavailable.length, games: unavailable });
 });
