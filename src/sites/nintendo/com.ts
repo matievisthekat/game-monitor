@@ -102,7 +102,7 @@ export default async function (browser: Browser) {
     manager.addTask(() => {
       return new Promise<void>(async (resolve) => {
         const page = await browser.newPage();
-        await page.goto(url, { timeout: 120000 });
+        await page.goto(url, { timeout: 0 });
 
         const end = async (availability?: Availability | void | null) => {
           games.push({ name, url, availability: availability || "unavailable", img });

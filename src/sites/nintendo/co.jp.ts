@@ -67,7 +67,7 @@ export default async function (browser: Browser) {
     manager.addTask(() => {
       return new Promise<void>(async (resolve) => {
         const page = await browser.newPage();
-        await page.goto(url, { timeout: 120000 }).catch((e) => console.log("\n", url, e));
+        await page.goto(url, { timeout: 0 }).catch((e) => console.log("\n", url, e));
 
         page
           .waitForSelector("h1.productDetail--headline__title", { visible: true })

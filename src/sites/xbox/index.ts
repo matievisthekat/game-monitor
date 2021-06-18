@@ -9,7 +9,7 @@ export default async function (browser: Browser, locale: Locale) {
   console.log(`[xbox/${locale}] Fetching game urls...`);
 
   const page = await browser.newPage();
-  await page.goto(`https://www.xbox.com/${locale}/games/all-games?cat=all`, { timeout: 120000 });
+  await page.goto(`https://www.xbox.com/${locale}/games/all-games?cat=all`, { timeout: 0 });
 
   const handlePopup = async (page: Page) => {
     if (await page.$("div#srInvBody").catch(() => {})) {
@@ -83,7 +83,7 @@ export default async function (browser: Browser, locale: Locale) {
       const page = await browser.newPage();
       const game: Game = { url, name, availability: "unavailable", img };
 
-      await page.goto(url, { timeout: 120000 }).catch((e) => console.log(`\n${url} ${e}`));
+      await page.goto(url, { timeout: 0 }).catch((e) => console.log(`\n${url} ${e}`));
 
       if (url.includes("microsoft")) {
         if (page.url().startsWith(url)) {
