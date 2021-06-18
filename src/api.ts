@@ -4,7 +4,7 @@ import { BasicInfo, JsonFile, Locale, Site } from "./types";
 import { checkSiteAndLocale, getALlJson, getJson, publicDir, removeDuplicates } from "./util";
 
 const app = express();
-const port = 80;
+const port = 3000;
 
 app.set("json spaces", 2);
 app.use(express.static(publicDir));

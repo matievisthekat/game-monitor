@@ -1,6 +1,7 @@
 import { launch } from "puppeteer";
 import { mkdir } from "fs-extra";
 import { join } from "path";
+import { CronJob } from "cron";
 
 import nintendoCom from "./sites/nintendo/com";
 import nintendoJp from "./sites/nintendo/co.jp";
@@ -10,14 +11,13 @@ import playstation from "./sites/playstation/index";
 import { publicDir, TaskManager } from "./util";
 import "./api";
 
-const width = 1024;
-const height = 600;
+const job = new CronJob("0 1 * * *", async () => await run(), null, true, "Europe/London");
+job.start();
 
-launch({
-  headless: true,
-  defaultViewport: { width, height },
-  args: ["--proxy-server=vps.matievisthekat.dev:3128"],
-}).then(async (browser) => {
+async function run() {
+  const width = 1024;
+  const height = 600;
+
   const tasks = new TaskManager(3);
 
   await mkdir(publicDir).catch(() => {});
@@ -28,20 +28,22 @@ launch({
     .addTask(async () => await mkdir(join(publicDir, "playstation")).catch(() => {}))
     .runAll();
 
-  tasks.setLimit(1);
+  launch({
+    headless: true,
+    defaultViewport: { width, height },
+    // args: ["--proxy-server=vps.matievisthekat.dev:3128"],
+  }).then(async (browser) => {
+    await nintendoJp(browser).catch((err) => console.log(`\n\n[nintendo/ja-jp]\n${err}\n\n`));
+    await nintendoCom(browser).catch((err) => console.log(`\n\n[nintendo/ja-jp]\n${err}\n\n`));
 
-  await tasks
-    .addTask(async () => await nintendoJp(browser))
-    .addTask(async () => await nintendoCom(browser))
+    await xbox(browser, "en-gb").catch((err) => console.log(`\n\n[xbox/en-gb]\n${err}\n\n`));
+    await xbox(browser, "en-us").catch((err) => console.log(`\n\n[xbox/en-us]\n${err}\n\n`));
+    await xbox(browser, "ja-jp").catch((err) => console.log(`\n\n[xbox/ja-jp]\n${err}\n\n`));
 
-    .addTask(async () => await xbox(browser, "en-gb"))
-    .addTask(async () => await xbox(browser, "en-us"))
-    .addTask(async () => await xbox(browser, "ja-jp"))
+    await playstation(browser, "en-gb").catch((err) => console.log(`\n\n[playstation/en-gb]\n${err}\n\n`));
+    await playstation(browser, "en-us").catch((err) => console.log(`\n\n[playstation/en-us]\n${err}\n\n`));
+    await playstation(browser, "ja-jp").catch((err) => console.log(`\n\n[playstation/ja-jp]\n${err}\n\n`));
 
-    .addTask(async () => await playstation(browser, "en-gb"))
-    .addTask(async () => await playstation(browser, "en-us"))
-    .addTask(async () => await playstation(browser, "ja-jp"))
-    .runAll();
-
-  await browser.close();
-});
+    await browser.close();
+  });
+}
