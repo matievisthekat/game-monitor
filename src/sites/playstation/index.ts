@@ -6,70 +6,67 @@ import { publicDir, TaskManager, wait, write } from "../../util";
 
 export default async function (browser: Browser, locale: Locale) {
   const json = join(publicDir, `playstation/${locale}.json`);
-  // console.log(`[playstation/${locale}] Fetching game urls...`);
+  console.log(`[playstation/${locale}] Fetching game urls...`);
 
-  // const page = await browser.newPage();
-  // await page.goto(`https://store.playstation.com/${locale}/collections`, { timeout: 120000 });
+  const page = await browser.newPage();
+  await page.goto(`https://store.playstation.com/${locale}/collections`, { timeout: 120000 });
 
-  // await page.waitForSelector("h2#title-bbc9be0f-fe39-11ea-aadc-062143ad1e8d");
+  await page.waitForSelector("h2#title-bbc9be0f-fe39-11ea-aadc-062143ad1e8d");
 
-  // const genreList = (await page.$$("ul.ems-sdk-collection__list"))[1];
-  // const genreUrls = await genreList.$$eval("li > a", (els) => els.map((e) => (e as HTMLAnchorElement).href));
+  const genreList = (await page.$$("ul.ems-sdk-collection__list"))[1];
+  const genreUrls = await genreList.$$eval("li > a", (els) => els.map((e) => (e as HTMLAnchorElement).href));
 
-  // await page.close();
+  await page.close();
 
   const manager = new TaskManager(5);
-  // const _basicInfo: BasicInfo[] = [];
+  const _basicInfo: BasicInfo[] = [];
 
-  // for (const url of genreUrls) {
-  //   manager.addTask(async () => {
-  //     const page = await browser.newPage();
-  //     await page.goto(url, { timeout: 120000 });
+  for (const url of genreUrls) {
+    manager.addTask(async () => {
+      const page = await browser.newPage();
+      await page.goto(url, { timeout: 120000 });
 
-  //     const waitForItems = async () => {
-  //       await page.waitForSelector("ul.ems-sdk-product-tile-list > li.psw-cell > div > a");
-  //       await page.waitForSelector("div.ems-sdk-grid-paginator__page-buttons > button");
-  //     };
+      const waitForItems = async () => {
+        await page.waitForSelector("ul.ems-sdk-product-tile-list > li.psw-cell > div > a");
+        await page.waitForSelector("div.ems-sdk-grid-paginator__page-buttons > button");
+      };
 
-  //     await waitForItems();
+      await waitForItems();
 
-  //     const nextSel = "button.ems-sdk-grid-paginator__button.psw-button.psw-primary-button";
-  //     const next = (await page.$$(nextSel))[1];
+      const nextSel = "button.ems-sdk-grid-paginator__button.psw-button.psw-primary-button";
+      const next = (await page.$$(nextSel))[1];
 
-  //     let plsBreak = false;
-  //     while (true) {
-  //       if (plsBreak) break;
-  //       else {
-  //         await waitForItems();
+      let plsBreak = false;
+      while (true) {
+        if (plsBreak) break;
+        else {
+          await waitForItems();
 
-  //         const games = await page.$$("li.psw-cell > div > a.ems-sdk-product-tile-link");
-  //         for (const game of games) {
-  //           const url = await game.evaluate((e) => (e as HTMLAnchorElement).href);
-  //           const name = await game.$eval("section > span", (e) => e.textContent || "[unknown]");
-  //           _basicInfo.push({ url, name });
-  //         }
+          const games = await page.$$("li.psw-cell > div > a.ems-sdk-product-tile-link");
+          for (const game of games) {
+            const url = await game.evaluate((e) => (e as HTMLAnchorElement).href);
+            const name = await game.$eval("section > span", (e) => e.textContent || "[unknown]");
+            _basicInfo.push({ url, name });
+          }
 
-  //         const nextDisabled = await next.evaluate((e) => e.classList.contains("psw-is-disabled"));
-  //         if (nextDisabled) plsBreak = true;
-  //         else {
-  //           await next.hover();
-  //           await wait(500);
-  //           await next.click();
-  //           await waitForItems();
-  //         }
-  //       }
-  //     }
+          const nextDisabled = await next.evaluate((e) => e.classList.contains("psw-is-disabled"));
+          if (nextDisabled) plsBreak = true;
+          else {
+            await next.hover();
+            await wait(500);
+            await next.click();
+            await waitForItems();
+          }
+        }
+      }
 
-  //     await page.close();
-  //   });
-  // }
+      await page.close();
+    });
+  }
 
-  // await manager.runAll();
-  // const basicInfo = [...new Set(_basicInfo)];
+  await manager.runAll();
+  const basicInfo = [...new Set(_basicInfo)];
   // await write(json, { basicInfo });
-
-  const { basicInfo } = require("../../../public/playstation/en-gb.json");
-
   const games: Game[] = [];
   const bar = new SingleBar(
     { format: `[playstation/${locale}] [{bar}] {percentage}% ({value}/{total}) | ETA {eta_formatted}`, etaBuffer: 100 },
