@@ -4,7 +4,7 @@ export type Site = "nintendo" | "xbox" | "playstation";
 export interface Game {
   name: string;
   url: string;
-  availability: string;
+  availability: "available" | "unavailable";
   img?: string;
 }
 

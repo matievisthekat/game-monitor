@@ -76,7 +76,11 @@ export default async function (browser: Browser) {
 
             const availability =
               (await page
-                .$eval("a.productDetail--buttons__button--primary", (e) => e.textContent?.trim())
+                .$eval("a.productDetail--buttons__button--primary", (e) =>
+                  ["購入にすすむ", "無料ダウンロード"].includes(e.textContent?.trim() || "")
+                    ? "available"
+                    : "unavailable"
+                )
                 .catch(() => {})) || "unavailable";
 
             games.push({ name, availability, url, img });
