@@ -6,6 +6,9 @@
   "author": "Matthew Stead <matievisthekat@gmail.com>",
   "license": "MIT",
   "private": false,
+  "scripts": {
+    "start": "tsc && node ."
+  },
   "dependencies": {
     "@types/fs-extra": "^9.0.11",
     "cli-progress": "^3.9.0",
