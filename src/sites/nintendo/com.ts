@@ -2,7 +2,7 @@ import { join } from "path";
 import { publicDir, TaskManager, wait, write } from "../../util";
 import { Browser } from "puppeteer";
 import { Presets, SingleBar } from "cli-progress";
-import { BasicInfo, Game } from "../../types";
+import { Availability, BasicInfo, Game } from "../../types";
 
 const json = join(publicDir, "nintendo/en-(gb+us).json");
 
@@ -104,7 +104,7 @@ export default async function (browser: Browser) {
         const page = await browser.newPage();
         await page.goto(url, { timeout: 120000 });
 
-        const end = async (availability?: string | void | null) => {
+        const end = async (availability?: Availability | void | null) => {
           games.push({ name, url, availability: availability || "unavailable", img });
 
           await page.close();

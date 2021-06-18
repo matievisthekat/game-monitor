@@ -1,7 +1,7 @@
 import { Presets, SingleBar } from "cli-progress";
 import { join } from "path";
 import { Browser } from "puppeteer";
-import { BasicInfo, Game, Locale } from "../../types";
+import { Availability, BasicInfo, Game, Locale } from "../../types";
 import { publicDir, TaskManager, wait, write } from "../../util";
 
 export default async function (browser: Browser, locale: Locale) {
@@ -80,7 +80,7 @@ export default async function (browser: Browser, locale: Locale) {
   for (const { url, name } of basicInfo) {
     manager.addTask(async () => {
       const page = await browser.newPage();
-      let availability = "";
+      let availability: Availability = "unavailable";
 
       await page.goto(url, { timeout: 0 }).catch((e) => console.log(`\n${page.url()} ${e}`));
       await page

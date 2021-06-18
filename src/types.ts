@@ -1,10 +1,11 @@
 export type Locale = "en-gb" | "en-us" | "ja-jp" | "en-(gb+us)";
 export type Site = "nintendo" | "xbox" | "playstation";
+export type Availability = "available" | "unavailable";
 
 export interface Game {
   name: string;
   url: string;
-  availability: "available" | "unavailable";
+  availability: Availability;
   img?: string;
 }
 
