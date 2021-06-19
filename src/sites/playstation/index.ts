@@ -83,7 +83,7 @@ export default async function (browser: Browser, locale: Locale) {
       await page
         .waitForSelector('span.psw-h3[data-qa="mfeCtaMain#offer0#finalPrice"]')
         .catch(() => (availability = "unavailable"));
-      await page.waitForSelector("h1.psw-m-b-xs").catch((e) => console.log(`\n${url} ${e}`));
+      await page.waitForSelector("h1.psw-m-b-xs").catch((e) => console.log(`\n${url}\n${e}`));
 
       availability = await page
         .$eval('span.psw-h3[data-qa="mfeCtaMain#offer0#finalPrice"]', (e) =>

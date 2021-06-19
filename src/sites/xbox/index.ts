@@ -83,22 +83,26 @@ export default async function (browser: Browser, locale: Locale) {
       const page = await browser.newPage();
       const game: Game = { url, name, availability: "unavailable", img };
 
-      await page.goto(url, { timeout: 0 }).catch((e) => console.log(`\n${url} ${e}`));
+      await page.goto(url, { timeout: 0 }).catch((e) => console.log(`\n${url}\n${e}`));
 
-      if (url.includes("microsoft")) {
+      if (url.includes("microsoft.com")) {
         if (page.url().startsWith(url)) {
-          await page.waitForSelector("div#productTitle > * > *").catch((e) => console.log(`\n${url} ${e}`));
+          await page
+            .waitForSelector("div#productTitle > * > *", { timeout: 120000 })
+            .catch((e) => console.log(`\n${url}\n${e}`));
 
           game.availability = (await page.$("button#buttonPanel_AppIdentityBuyButton")) ? "available" : "unavailable";
         }
       } else {
         const over18 = await page.$("div#over18 > a");
         if (over18) {
-          await over18.hover();
-          await over18.click();
+          await over18.hover().catch(() => {});
+          await over18.click().catch(() => {});
         }
 
-        await page.waitForSelector("a.c-call-to-action.c-glyph").catch((e) => console.log(`\n${url} ${e}`));
+        await page
+          .waitForSelector("a.c-call-to-action.c-glyph", { timeout: 120000 })
+          .catch((e) => console.log(`\n${url}\n${e}`));
 
         game.availability = (await page.$("a.c-call-to-action.c-glyph")) ? "available" : "unavailable";
       }

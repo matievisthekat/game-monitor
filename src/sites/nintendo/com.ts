@@ -50,7 +50,7 @@ export default async function (browser: Browser) {
       manager.addTask(() => {
         return new Promise<void>(async (resolve) => {
           const page = await browser.newPage();
-          await page.goto(`${url}&dFR[genres][0]=${genre}&dFR[priceRange][0]=${price}`, { timeout: 120000 });
+          await page.goto(`${url}&dFR[genres][0]=${genre}&dFR[priceRange][0]=${price}`, { timeout: 0 });
 
           const sel = "styled-button#btn-load-more > span";
           let plsBreak = false;
@@ -58,7 +58,7 @@ export default async function (browser: Browser) {
           while (true) {
             if (plsBreak) break;
             else {
-              await page.waitForSelector(sel);
+              await page.waitForSelector(sel, { timeout: 0 });
               await page.evaluate((s) => document.querySelector(s)?.scrollIntoView(), sel);
               await wait(1000);
               const e = await page.$(sel).catch(() => {});
@@ -119,7 +119,7 @@ export default async function (browser: Browser) {
         });
 
         page
-          .waitForSelector("div.buy-digital > a > styled-button", { visible: true })
+          .waitForSelector("div.buy-digital > a > styled-button"/*, { visible: true }*/)
           .then(async () => {
             const buttonVisible = await page.$eval(
               "a.digital-purchase.buy-now-link",
