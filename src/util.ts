@@ -1,6 +1,6 @@
 import { readJSON, writeJSON } from "fs-extra";
 import { resolve, join } from "path";
-import { BasicInfo, JsonFile, Locale, Site } from "./types";
+import { BasicInfo, Game, JsonFile, Locale, Site } from "./types";
 
 export const publicDir = resolve("public");
 
@@ -38,14 +38,38 @@ export async function getALlJson() {
   };
 }
 
-export function getJson(site: Site, locale: Locale) {
-  return new Promise<JsonFile>((resolve) => {
+export function getJson(site: Site, locale?: Locale) {
+  return new Promise<JsonFile>(async (resolve) => {
     if (site === "nintendo" && (locale === "en-gb" || locale === "en-us")) locale = "en-(gb+us)";
 
-    const json = join(publicDir, site, `${locale}.json`);
-    readJSON(json)
-      .then((data) => resolve(data))
-      .catch(() => resolve({ games: [] }));
+    if (locale) {
+      const json = join(publicDir, site, `${locale}.json`);
+      readJSON(json)
+        .then((data) => resolve(data))
+        .catch(() => resolve({ games: [] }));
+    } else {
+      if (site === "nintendo") {
+        const games: Game[] = [];
+        const en = join(publicDir, "nintendo", "en-(gb+us).json");
+        const jp = join(publicDir, "nintendo", "ja-jp.json");
+
+        await readJSON(en).then((data) => games.push(...data.games));
+        await readJSON(jp).then((data) => games.push(...data.games));
+
+        resolve({ games });
+      } else {
+        const games: Game[] = [];
+        const gb = join(publicDir, site, "en-gb.json");
+        const us = join(publicDir, site, "en-us.json");
+        const jp = join(publicDir, site, "ja-jp.json");
+
+        await readJSON(gb).then((data) => games.push(...data.games));
+        await readJSON(us).then((data) => games.push(...data.games));
+        await readJSON(jp).then((data) => games.push(...data.games));
+
+        resolve({ games });
+      }
+    }
   });
 }
 

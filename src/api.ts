@@ -76,4 +76,25 @@ app.get("/api/search", async (req, res) => {
     .json(results.map((r) => Object.assign(games.find((g) => g.name === r.target) as BasicInfo, { score: r.score })));
 });
 
+app.get("/api/:site", async (req, res) => {
+  const { site } = req.params as Record<string, string>;
+
+  if (!["xbox", "nintendo", "playstation"].includes(site))
+    return res.status(400).json({ error: "Invalid 'site' param" });
+
+  const { games } = await getJson(site as Site);
+  res.status(200).json({ amount: games.length, games });
+});
+
+app.get("/api/:site/:locale", async (req, res) => {
+  const { site, locale } = req.params as Record<string, string>;
+
+  if (!["xbox", "nintendo", "playstation"].includes(site))
+    return res.status(400).json({ error: "Invalid 'site' param" });
+  if (!["en-gb", "en-us", "ja-jp"].includes(locale)) return res.status(400).json({ error: "Invalid 'locale' param" });
+
+  const { games } = await getJson(site as Site, locale as Locale);
+  res.status(200).json({ amount: games.length, games });
+});
+
 app.listen(port, () => console.log(`[api] Listening on port ${port}`));
