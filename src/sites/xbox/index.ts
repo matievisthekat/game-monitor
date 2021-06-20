@@ -87,11 +87,13 @@ export default async function (browser: Browser, locale: Locale) {
 
       if (url.includes("microsoft.com")) {
         if (page.url().startsWith(url)) {
-          await page
-            .waitForSelector("div#productTitle > * > *", { timeout: 120000 })
-            .catch((e) => console.log(`\n${url}\n${e}`));
+          // await page
+          //   .waitForSelector("div#productTitle > * > *", { timeout: 120000 })
+          //   .catch((e) => console.log(`\n${url}\n${e}`));
 
-          game.availability = (await page.$("button#buttonPanel_AppIdentityBuyButton")) ? "available" : "unavailable";
+          game.availability = (await page.$("button#buttonPanel_AppIdentityBuyButton").catch(() => {}))
+            ? "available"
+            : "unavailable";
         }
       } else {
         const over18 = await page.$("div#over18 > a");

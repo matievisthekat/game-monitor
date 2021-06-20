@@ -33,19 +33,41 @@ async function run() {
     headless: true,
     defaultViewport: { width, height },
   }).then(async (browser) => {
-    await nintendoJp(browser).catch((err) => console.log(`\n\n[nintendo/ja-jp]\n${err}\n\n`));
-    await nintendoCom(browser).catch((err) => console.log(`\n\n[nintendo/ja-jp]\n${err}\n\n`));
+    try {
+      // await nintendoJp(browser).catch((err) => console.log(`\n\n[nintendo/ja-jp]\n${err}\n\n`));
+    } catch (err) {
+      console.log(`\n\n[nintendo/ja-jp]\n${err}\n\n`);
+    }
 
-    await xbox(browser, "en-gb").catch((err) => console.log(`\n\n[xbox/en-gb]\n${err}\n\n`));
-    await xbox(browser, "en-us").catch((err) => console.log(`\n\n[xbox/en-us]\n${err}\n\n`));
-    await xbox(browser, "ja-jp").catch((err) => console.log(`\n\n[xbox/ja-jp]\n${err}\n\n`));
+    try {
+      // await nintendoCom(browser).catch((err) => console.log(`\n\n[nintendo/en-(gb+us)]\n${err}\n\n`));
+    } catch (err) {
+      console.log(`\n\n[nintendo/en-(gb+us)]\n${err}\n\n`);
+    }
+
+    try {
+      await xbox(browser, "en-gb").catch((err) => console.log(`\n\n[xbox/en-gb]\n${err}\n\n`));
+    } catch (err) {
+      console.log(`\n\n[xbox/en-gb]\n${err}\n\n`);
+    }
+
+    try {
+      await xbox(browser, "en-us").catch((err) => console.log(`\n\n[xbox/en-us]\n${err}\n\n`));
+    } catch (err) {
+      console.log(`\n\n[xbox/en-us]\n${err}\n\n`);
+    }
+
+    try {
+      await xbox(browser, "ja-jp").catch((err) => console.log(`\n\n[xbox/ja-jp]\n${err}\n\n`));
+    } catch (err) {
+      console.log(`\n\n[xbox/ja-jp]\n${err}\n\n`);
+    }
 
     // await playstation(browser, "en-gb").catch((err) => console.log(`\n\n[playstation/en-gb]\n${err}\n\n`));
     // await playstation(browser, "en-us").catch((err) => console.log(`\n\n[playstation/en-us]\n${err}\n\n`));
     // await playstation(browser, "ja-jp").catch((err) => console.log(`\n\n[playstation/ja-jp]\n${err}\n\n`));
 
     console.log("\n\nFetched games\n\n");
-
     await browser.close();
   });
 }
