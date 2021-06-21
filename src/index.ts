@@ -16,8 +16,8 @@ import "./api";
 run();
 
 async function run() {
-  const width = 1024;
-  const height = 600;
+  const width = 1119;
+  const height = 669;
 
   const tasks = new TaskManager(3);
 
@@ -32,6 +32,11 @@ async function run() {
   launch({
     headless: true,
     defaultViewport: { width, height },
+    args: [
+      "--no-sandbox",
+      "--no-startup-window",
+      "--blink-settings=imagesEnabled=false" /*"--proxy-server=lon1.matievisthekat.dev:3128"*/,
+    ],
   }).then(async (browser) => {
     try {
       // await nintendoJp(browser).catch((err) => console.log(`\n\n[nintendo/ja-jp]\n${err}\n\n`));
