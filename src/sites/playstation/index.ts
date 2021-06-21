@@ -46,7 +46,11 @@ export default async function (browser: Browser, locale: Locale) {
           for (const game of games) {
             const url = await game.evaluate((e) => (e as HTMLAnchorElement).href);
             const name = await game.$eval("section > span", (e) => e.textContent || "[unknown]");
-            _basicInfo.push({ url, name });
+            const img = await game.$eval(
+              "div.ems-sdk-product-tile-image > div.ems-sdk-product-tile-image__container > span.psw-media-frame > img",
+              (e) => (e as HTMLImageElement).src
+            );
+            _basicInfo.push({ url, name, img });
           }
 
           const nextDisabled = await next.evaluate((e) => e.classList.contains("psw-is-disabled"));
@@ -74,7 +78,7 @@ export default async function (browser: Browser, locale: Locale) {
   );
 
   bar.start(basicInfo.length, 0);
-  for (const { url, name } of basicInfo) {
+  for (const { url, name, img } of basicInfo) {
     manager.addTask(async () => {
       const page = await browser.newPage();
       let availability: Availability = "unavailable";
@@ -91,7 +95,7 @@ export default async function (browser: Browser, locale: Locale) {
         )
         .catch(() => "unavailable");
 
-      games.push({ name, availability, url });
+      games.push({ name, availability, url, img });
       await page.close();
       bar.increment();
     });
