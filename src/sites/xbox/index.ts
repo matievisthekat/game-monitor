@@ -25,21 +25,21 @@ export default async function (browser: Browser, locale: Locale) {
     "section.select-menu.live-area.sort-area.x-visible-inline-block.gameSort.generalSort > div.c-select div.c-select-menu.f-persist > button";
   await page.waitForSelector(sortListButton, { visible: true });
   await page.hover(sortListButton);
-  await page.click(sortListButton);
+  await page.click(sortListButton).catch((e) => console.log(`\n\nsortListButton\n${e.message}\n\n`));
 
   await page.waitForSelector('li[id$="-select-menu-2"]', { visible: true });
   await wait(1000);
   await page.hover('li[id$="-select-menu-2"]');
-  await page.click('li[id$="-select-menu-2"]');
+  await page.click('li[id$="-select-menu-2"]').catch((e) => console.log(`\n\nli-select-menu-2\n${e.message}\n\n`));
 
   const paginateButton = "section.paginateDropdown > div > div > button";
   await page.hover(paginateButton);
-  await page.click(paginateButton);
+  await page.click(paginateButton).catch((e) => console.log(`\n\npaginateButton\n${e.message}\n\n`));
 
   const paginateLi = "section.paginateDropdown > div > div > ul > li[id$='-select-menu-3'] > span";
   await page.waitForSelector(paginateLi);
   await page.hover(paginateLi);
-  await page.click(paginateLi);
+  await page.click(paginateLi).catch((e) => console.log(`\n\npaginateLi\n${e.message}\n\n`));
 
   await page.waitForSelector("div.m-product-placement-item.context-game.gameDiv", { timeout: 0, visible: true });
 
@@ -86,15 +86,22 @@ export default async function (browser: Browser, locale: Locale) {
       await page.goto(url, { timeout: 0 }).catch((e) => console.log(`\n${url}\n${e}`));
 
       if (url.includes("microsoft.com")) {
-        if (page.url().startsWith(url)) {
-          // await page
-          //   .waitForSelector("div#productTitle > * > *", { timeout: 120000 })
-          //   .catch((e) => console.log(`\n${url}\n${e}`));
-
-          game.availability = (await page.$("button#buttonPanel_AppIdentityBuyButton").catch(() => {}))
-            ? "available"
-            : "unavailable";
+        const regionRedirect = await page.$("div#R1MarketRedirect-1 > button.c-glyph.glyph-cancel");
+        if (regionRedirect) {
+          await regionRedirect.hover().catch(() => {});
+          await regionRedirect.click().catch(() => {});
         }
+
+        if (!page.url().includes("/errorpages/smarterror.aspx")) {
+          await page.waitForSelector("div.pi-product-metadata.primary", { visible: true });
+
+          const msg = await page.$("div#BuyBoxMessages_pricingMessages_PricingMessage");
+          const text = await msg?.evaluate((e) => e.textContent);
+          if (msg && text) {
+            const available = !/(not available|not sold)/gi.test(text);
+            game.availability = available ? "available" : "unavailable";
+          } else game.availability = "available";
+        } else game.availability = "unknown";
       } else {
         const over18 = await page.$("div#over18 > a");
         if (over18) {
@@ -103,10 +110,9 @@ export default async function (browser: Browser, locale: Locale) {
         }
 
         await page
-          .waitForSelector("a.c-call-to-action.c-glyph", { timeout: 120000 })
-          .catch((e) => console.log(`\n${url}\n${e}`));
-
-        game.availability = (await page.$("a.c-call-to-action.c-glyph")) ? "available" : "unavailable";
+          .waitForSelector("a.c-call-to-action.c-glyph")
+          .then(() => (game.availability = "available"))
+          .catch(() => (game.availability = "unavailable"));
       }
 
       games.push(game);
