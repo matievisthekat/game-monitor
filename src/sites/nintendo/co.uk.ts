@@ -78,7 +78,9 @@ export default async function (browser: Browser) {
     manager.addTask(() => {
       return new Promise<void>(async (resolve) => {
         const page = await browser.newPage();
-        await page.goto(url, { timeout: 120000, waitUntil: "domcontentloaded" }).catch((e) => console.log("\n", url, e));
+        await page
+          .goto(url, { timeout: 120000, waitUntil: "domcontentloaded" })
+          .catch((e) => console.log(`\n\n${url}\n${e}\n\n`));
 
         page
           .waitForSelector("span.gamepage-header-meta", { visible: true })
