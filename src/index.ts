@@ -10,11 +10,12 @@ import xbox from "./sites/xbox/index";
 import playstation from "./sites/playstation/index";
 
 import { publicDir, TaskManager } from "./util";
+import "./proxy";
 import "./api";
 
 // const job = new CronJob("0 1 * * *", async () => await run(), null, false, "Europe/London");
 // job.start();
-run();
+// run();
 
 async function run() {
   const width = 1119;
@@ -34,15 +35,15 @@ async function run() {
     headless: true,
     userDataDir: "./cache",
     defaultViewport: { width, height },
-    args: ["--no-sandbox", "--disable-setuid-sandbox" /*, "--proxy-server=lon1.matievisthekat.dev:3128"*/],
+    args: ["--no-sandbox", "--disable-setuid-sandbox", "--proxy-server=localhost:3001"],
   }).then(async (browser) => {
     browser.on("targetcreated", async (target: Target) => {
       const page = await target.page();
       if (page) {
         await page.setRequestInterception(true);
         page.on("request", async (r) => {
-          if (["document", "script"].includes(r.resourceType())) await r.continue();
-          else await r.abort();
+          if (["stylesheet", "font", "image", "media"].includes(r.resourceType())) await r.abort();
+          else await r.continue();
         });
       }
     });
@@ -53,11 +54,11 @@ async function run() {
     //   console.log(`\n\n[nintendo/en-gb)]\n${err}\n\n`);
     // }
 
-    try {
-      await nintendoCom(browser).catch((err) => console.log(`\n\n[nintendo/en-us]\n${err}\n\n`));
-    } catch (err) {
-      console.log(`\n\n[nintendo/en-us]\n${err}\n\n`);
-    }
+    // try {
+    //   await nintendoCom(browser).catch((err) => console.log(`\n\n[nintendo/en-us]\n${err}\n\n`));
+    // } catch (err) {
+    //   console.log(`\n\n[nintendo/en-us]\n${err}\n\n`);
+    // }
 
     // try {
     //   await nintendoJp(browser).catch((err) => console.log(`\n\n[nintendo/ja-jp]\n${err}\n\n`));
@@ -89,17 +90,17 @@ async function run() {
     //   console.log(`\n\n[playstation/en-gb]\n${err}\n\n`);
     // }
 
-    // try {
-    //   await playstation(browser, "en-us").catch((err) => console.log(`\n\n[playstation/en-us]\n${err}\n\n`));
-    // } catch (err) {
-    //   console.log(`\n\n[playstation/en-us]\n${err}\n\n`);
-    // }
+    try {
+      await playstation(browser, "en-us").catch((err) => console.log(`\n\n[playstation/en-us]\n${err}\n\n`));
+    } catch (err) {
+      console.log(`\n\n[playstation/en-us]\n${err}\n\n`);
+    }
 
-    // try {
-    //   await playstation(browser, "ja-jp").catch((err) => console.log(`\n\n[playstation/ja-jp]\n${err}\n\n`));
-    // } catch (err) {
-    //   console.log(`\n\n[playstation/ja-jp]\n${err}\n\n`);
-    // }
+    try {
+      await playstation(browser, "ja-jp").catch((err) => console.log(`\n\n[playstation/ja-jp]\n${err}\n\n`));
+    } catch (err) {
+      console.log(`\n\n[playstation/ja-jp]\n${err}\n\n`);
+    }
 
     await browser.close();
     console.log("\n\nFetched games\n\n");
