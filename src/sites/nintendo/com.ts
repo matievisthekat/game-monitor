@@ -4,7 +4,7 @@ import { Browser } from "puppeteer";
 import { Presets, SingleBar } from "cli-progress";
 import { Availability, BasicInfo, Game } from "../../types";
 
-const json = join(publicDir, "nintendo/en-(gb+us).json");
+const json = join(publicDir, "nintendo/en-us.json");
 
 interface GameTile extends Element {
   href: string;
@@ -43,7 +43,7 @@ export default async function (browser: Browser) {
   const manager = new TaskManager(5);
   const _basicInfo: BasicInfo[] = [];
 
-  console.log("[nintendo/en-(gb+us)] Fetching game urls...");
+  console.log("[nintendo/en-us] Fetching game urls...");
 
   for (const genre of genreFilters) {
     for (const price of priceFilters) {
@@ -73,9 +73,7 @@ export default async function (browser: Browser) {
           for (const tile of tiles) {
             const url = await tile.evaluate((e) => `https://nintendo.com${(e as GameTile).href}`);
             const name = await tile.$eval("h3", (e) => e.textContent || "[unknown]");
-            const img = await tile.evaluate(
-              (e) => e.shadowRoot?.querySelector<HTMLImageElement>("div > a > img.loaded")?.src
-            );
+            const img = await tile.evaluate((e) => e.shadowRoot?.querySelector<HTMLImageElement>("div > a > img.loaded")?.src);
             _basicInfo.push({ url, name, img });
           }
 
@@ -91,12 +89,11 @@ export default async function (browser: Browser) {
   // await write(json, { basicInfo });
   const games: Game[] = [];
   const bar = new SingleBar(
-    { format: "[nintendo/en-(gb+us)] [{bar}] {percentage}% ({value}/{total}) | ETA {eta_formatted}", etaBuffer: 100 },
+    { format: "[nintendo/en-us] [{bar}] {percentage}% ({value}/{total}) | ETA {eta_formatted}", etaBuffer: 100 },
     Presets.shades_classic
   );
 
   bar.start(basicInfo.length, 0);
-  manager.setLimit(10);
 
   for (const { url, name, img } of basicInfo) {
     manager.addTask(() => {
@@ -119,7 +116,7 @@ export default async function (browser: Browser) {
         });
 
         page
-          .waitForSelector("div.buy-digital > a > styled-button"/*, { visible: true }*/)
+          .waitForSelector("div.buy-digital > a > styled-button" /*, { visible: true }*/)
           .then(async () => {
             const buttonVisible = await page.$eval(
               "a.digital-purchase.buy-now-link",
@@ -143,5 +140,5 @@ export default async function (browser: Browser) {
 
   await manager.runAll();
   await write(json, { games });
-  console.log("\n[nintendo/en-(gb+us)] Done\n");
+  console.log("\n[nintendo/en-us] Done\n");
 }

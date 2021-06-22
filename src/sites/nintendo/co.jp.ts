@@ -10,7 +10,7 @@ const url = "https://www.nintendo.co.jp/software/switch/index.html?sftab=all&sfs
 
 export default async function (browser: Browser) {
   const page = await browser.newPage();
-  const manager = new TaskManager(10);
+  const manager = new TaskManager(5);
   const _basicInfo: BasicInfo[] = [];
 
   console.log("[nintendo/ja-jp] Fetching game urls...");
@@ -19,9 +19,7 @@ export default async function (browser: Browser) {
   await page.waitForSelector("li.nc3-as-result__listItem.nc3-l-grid__cell.is-shown.is-visible", { visible: true });
   await page.waitForSelector("div.nc3-js-scrollbar__content > div.nc3-js-scrollbar__content", { visible: true });
 
-  const pages = await page.$$(
-    "div.nc3-js-scrollbar__content > div.nc3-js-scrollbar__content > ul.nc3-c-pagination__list > li"
-  );
+  const pages = await page.$$("div.nc3-js-scrollbar__content > div.nc3-js-scrollbar__content > ul.nc3-c-pagination__list > li");
 
   const getPageGames = async (page: Page) => {
     const results = await page.$$("li.nc3-as-result__listItem.nc3-l-grid__cell.is-shown.is-visible");
@@ -77,9 +75,7 @@ export default async function (browser: Browser) {
             const availability =
               (await page
                 .$eval("a.productDetail--buttons__button--primary", (e) =>
-                  ["購入にすすむ", "無料ダウンロード"].includes(e.textContent?.trim() || "")
-                    ? "available"
-                    : "unavailable"
+                  ["購入にすすむ", "無料ダウンロード"].includes(e.textContent?.trim() || "") ? "available" : "unavailable"
                 )
                 .catch(() => {})) || "unavailable";
 

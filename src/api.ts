@@ -17,8 +17,7 @@ app.get("/api", async (req, res) => {
 app.get("/api/unavailable", async (req, res) => {
   const all = await getALlJson();
   const unavailable = all.games.filter(
-    (g) =>
-      g.availability === "unavailable" || !["購入にすすむ", "無料ダウンロード", "available"].includes(g.availability)
+    (g) => g.availability === "unavailable" || !["購入にすすむ", "無料ダウンロード", "available"].includes(g.availability)
   );
   res.status(200).json({ amount: unavailable.length, games: unavailable });
 });
@@ -79,8 +78,7 @@ app.get("/api/search", async (req, res) => {
 app.get("/api/:site", async (req, res) => {
   const { site } = req.params as Record<string, string>;
 
-  if (!["xbox", "nintendo", "playstation"].includes(site))
-    return res.status(400).json({ error: "Invalid 'site' param" });
+  if (!["xbox", "nintendo", "playstation"].includes(site)) return res.status(400).json({ error: "Invalid 'site' param" });
 
   const { games } = await getJson(site as Site);
   res.status(200).json({ amount: games.length, games });
@@ -89,8 +87,7 @@ app.get("/api/:site", async (req, res) => {
 app.get("/api/:site/:locale", async (req, res) => {
   const { site, locale } = req.params as Record<string, string>;
 
-  if (!["xbox", "nintendo", "playstation"].includes(site))
-    return res.status(400).json({ error: "Invalid 'site' param" });
+  if (!["xbox", "nintendo", "playstation"].includes(site)) return res.status(400).json({ error: "Invalid 'site' param" });
   if (!["en-gb", "en-us", "ja-jp"].includes(locale)) return res.status(400).json({ error: "Invalid 'locale' param" });
 
   const { games } = await getJson(site as Site, locale as Locale);
