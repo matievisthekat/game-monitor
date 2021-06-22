@@ -9,63 +9,63 @@ const json = join(publicDir, "nintendo/en-gb.json");
 const url = "https://www.nintendo.co.uk/Search/Search-299117.html?f=147394-89";
 
 export default async function (browser: Browser) {
-  // const page = await browser.newPage();
+  const page = await browser.newPage();
   const manager = new TaskManager(5);
-  // const _basicInfo: BasicInfo[] = [];
+  const _basicInfo: BasicInfo[] = [];
 
-  // console.log("[nintendo/en-gb] Fetching game urls...");
+  console.log("[nintendo/en-gb] Fetching game urls...");
 
-  // await page.goto(url, { timeout: 120000 });
-  // await page.click("a.pla-btn.pla-btn--dark.pla-btn--block.plo-cookie-overlay__accept-btn").catch(() => {});
-  // await page.waitForSelector("ul.results > li.searchresult_row > div > div > a > div.search-result-img > img");
-  // await page.waitForSelector("ul.results > li.searchresult_row > div > div > a > div.search-result-txt > p.page-title > span", {
-  //   visible: true,
-  // });
+  await page.goto(url, { timeout: 120000 });
+  await page.click("a.pla-btn.pla-btn--dark.pla-btn--block.plo-cookie-overlay__accept-btn").catch(() => {});
+  await page.waitForSelector("ul.results > li.searchresult_row > div > div > a > div.search-result-img > img");
+  await page.waitForSelector("ul.results > li.searchresult_row > div > div > a > div.search-result-txt > p.page-title > span", {
+    visible: true,
+  });
 
-  // const pages = await page.evaluate(() => {
-  //   const buttons: Element[] = Array.prototype.slice.call(document.querySelectorAll("button.btn.btn-primary"));
-  //   buttons.pop();
-  //   const max = buttons.pop()?.textContent;
-  //   return parseInt(max || "0");
-  // });
+  const pages = await page.evaluate(() => {
+    const buttons: Element[] = Array.prototype.slice.call(document.querySelectorAll("button.btn.btn-primary"));
+    buttons.pop();
+    const max = buttons.pop()?.textContent;
+    return parseInt(max || "0");
+  });
 
-  // const getGames = async (page: Page) => {
-  //   const results = await page.$$("ul.results > li.searchresult_row > div > div > a");
-  //   results.shift();
-  //   for (const result of results) {
-  //     const img = (await result.$eval("img", (e) => (e as HTMLImageElement).src).catch(() => {})) || undefined;
-  //     const url = await result.evaluate((e) => (e as HTMLAnchorElement).href);
-  //     const name = await result.$eval("span.page-title-text", (e) => e.textContent || "[unknown]");
+  const getGames = async (page: Page) => {
+    const results = await page.$$("ul.results > li.searchresult_row > div > div > a");
+    results.shift();
+    for (const result of results) {
+      const img = (await result.$eval("img", (e) => (e as HTMLImageElement).src).catch(() => {})) || undefined;
+      const url = await result.evaluate((e) => (e as HTMLAnchorElement).href);
+      const name = await result.$eval("span.page-title-text", (e) => e.textContent || "[unknown]");
 
-  //     _basicInfo.push({ url, name, img });
-  //   }
-  // };
+      _basicInfo.push({ url, name, img });
+    }
+  };
 
-  // await getGames(page);
-  // await page.close();
+  await getGames(page);
+  await page.close();
 
-  // for (let i = 1; i <= pages; i++) {
-  //   manager.addTask(async () => {
-  //     return new Promise<void>(async (resolve, reject) => {
-  //       const page = await browser.newPage();
-  //       await page.goto(`${url}&p=${i}`, { timeout: 120000 }).catch(() => {});
+  for (let i = 1; i <= pages; i++) {
+    manager.addTask(async () => {
+      return new Promise<void>(async (resolve, reject) => {
+        const page = await browser.newPage();
+        await page.goto(`${url}&p=${i}`, { timeout: 120000 }).catch(() => {});
 
-  //       await page
-  //         .waitForSelector("ul.results > li.searchresult_row > div > div > a > div.search-result-txt > p.page-title > span")
-  //         .then(async () => {
-  //           await getGames(page);
-  //           resolve();
-  //         })
-  //         .catch(() => resolve())
-  //         .finally(async () => await page.close());
-  //     });
-  //   });
-  // }
+        await page
+          .waitForSelector("ul.results > li.searchresult_row > div > div > a > div.search-result-txt > p.page-title > span")
+          .then(async () => {
+            await getGames(page);
+            resolve();
+          })
+          .catch(() => resolve())
+          .finally(async () => await page.close());
+      });
+    });
+  }
 
-  // await manager.runAll();
+  await manager.runAll();
 
-  // const basicInfo = [...new Set(_basicInfo)];
-  const { basicInfo } = require("../../../public/nintendo/en-gb.json");
+  const basicInfo = [...new Set(_basicInfo)];
+
   await write(json, { basicInfo });
   const games: Game[] = [];
   const bar = new SingleBar(

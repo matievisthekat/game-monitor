@@ -36,22 +36,22 @@ async function run() {
     defaultViewport: { width, height },
     args: ["--no-sandbox", "--disable-setuid-sandbox" /*, "--proxy-server=lon1.matievisthekat.dev:3128"*/],
   }).then(async (browser) => {
-    // browser.on("targetcreated", async (target: Target) => {
-    //   const page = await target.page();
-    //   if (page) {
-    //     await page.setRequestInterception(true);
-    //     page.on("request", async (r) => {
-    //       if (["document", "script"].includes(r.resourceType())) await r.continue();
-    //       else await r.abort();
-    //     });
-    //   }
-    // });
+    browser.on("targetcreated", async (target: Target) => {
+      const page = await target.page();
+      if (page) {
+        await page.setRequestInterception(true);
+        page.on("request", async (r) => {
+          if (["document", "script"].includes(r.resourceType())) await r.continue();
+          else await r.abort();
+        });
+      }
+    });
 
-    try {
-      await nintendoGb(browser).catch((err) => console.log(`\n\n[nintendo/en-gb]\n${err}\n\n`));
-    } catch (err) {
-      console.log(`\n\n[nintendo/en-gb)]\n${err}\n\n`);
-    }
+    // try {
+    //   await nintendoGb(browser).catch((err) => console.log(`\n\n[nintendo/en-gb]\n${err}\n\n`));
+    // } catch (err) {
+    //   console.log(`\n\n[nintendo/en-gb)]\n${err}\n\n`);
+    // }
 
     try {
       await nintendoCom(browser).catch((err) => console.log(`\n\n[nintendo/en-us]\n${err}\n\n`));
