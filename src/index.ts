@@ -11,9 +11,9 @@ import playstation from "./sites/playstation/index";
 import { publicDir, TaskManager } from "./util";
 import "./api";
 
-// const job = new CronJob("0 1 * * *", async () => await run(), null, false, "Europe/London");
-// job.start();
-run();
+const job = new CronJob("0 1 * * *", async () => await run(), null, false, "Europe/London");
+job.start();
+// run();
 
 async function run() {
   const width = 1119;
@@ -39,13 +39,13 @@ async function run() {
     ],
   }).then(async (browser) => {
     try {
-      // await nintendoJp(browser).catch((err) => console.log(`\n\n[nintendo/ja-jp]\n${err}\n\n`));
+      await nintendoJp(browser).catch((err) => console.log(`\n\n[nintendo/ja-jp]\n${err}\n\n`));
     } catch (err) {
       console.log(`\n\n[nintendo/ja-jp]\n${err}\n\n`);
     }
 
     try {
-      // await nintendoCom(browser).catch((err) => console.log(`\n\n[nintendo/en-(gb+us)]\n${err}\n\n`));
+      await nintendoCom(browser).catch((err) => console.log(`\n\n[nintendo/en-(gb+us)]\n${err}\n\n`));
     } catch (err) {
       console.log(`\n\n[nintendo/en-(gb+us)]\n${err}\n\n`);
     }
@@ -68,9 +68,23 @@ async function run() {
       console.log(`\n\n[xbox/ja-jp]\n${err}\n\n`);
     }
 
-    // await playstation(browser, "en-gb").catch((err) => console.log(`\n\n[playstation/en-gb]\n${err}\n\n`));
-    // await playstation(browser, "en-us").catch((err) => console.log(`\n\n[playstation/en-us]\n${err}\n\n`));
-    // await playstation(browser, "ja-jp").catch((err) => console.log(`\n\n[playstation/ja-jp]\n${err}\n\n`));
+    try {
+      await playstation(browser, "en-gb").catch((err) => console.log(`\n\n[playstation/en-gb]\n${err}\n\n`));
+    } catch (err) {
+      console.log(`\n\n[playstation/en-gb]\n${err}\n\n`);
+    }
+
+    try {
+      await playstation(browser, "en-us").catch((err) => console.log(`\n\n[playstation/en-us]\n${err}\n\n`));
+    } catch (err) {
+      console.log(`\n\n[playstation/en-us]\n${err}\n\n`);
+    }
+
+    try {
+      await playstation(browser, "ja-jp").catch((err) => console.log(`\n\n[playstation/ja-jp]\n${err}\n\n`));
+    } catch (err) {
+      console.log(`\n\n[playstation/ja-jp]\n${err}\n\n`);
+    }
 
     console.log("\n\nFetched games\n\n");
     await browser.close();
