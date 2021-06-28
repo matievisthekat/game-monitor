@@ -4,13 +4,11 @@ import { join } from "path";
 import { CronJob } from "cron";
 
 import nintendoGb from "./sites/nintendo/co.uk";
-import nintendoCom from "./sites/nintendo/com";
+import nintendoUs from "./sites/nintendo/com";
 import nintendoJp from "./sites/nintendo/co.jp";
 import xbox from "./sites/xbox/index";
-import playstation from "./sites/playstation/index";
 
 import { publicDir, TaskManager } from "./util";
-import "./proxy";
 import "./api";
 
 // const job = new CronJob("0 1 * * *", async () => await run(), null, false, "Europe/London");
@@ -28,14 +26,13 @@ async function run() {
   await tasks
     .addTask(async () => await mkdir(join(publicDir, "nintendo")).catch(() => {}))
     .addTask(async () => await mkdir(join(publicDir, "xbox")).catch(() => {}))
-    .addTask(async () => await mkdir(join(publicDir, "playstation")).catch(() => {}))
     .runAll();
 
   launch({
     headless: true,
     userDataDir: "./cache",
     defaultViewport: { width, height },
-    args: ["--no-sandbox", "--disable-setuid-sandbox", "--proxy-server=localhost:3001"],
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
   }).then(async (browser) => {
     browser.on("targetcreated", async (target: Target) => {
       const page = await target.page();
@@ -48,58 +45,40 @@ async function run() {
       }
     });
 
-    // try {
-    //   await nintendoGb(browser).catch((err) => console.log(`\n\n[nintendo/en-gb]\n${err}\n\n`));
-    // } catch (err) {
-    //   console.log(`\n\n[nintendo/en-gb)]\n${err}\n\n`);
-    // }
-
-    // try {
-    //   await nintendoCom(browser).catch((err) => console.log(`\n\n[nintendo/en-us]\n${err}\n\n`));
-    // } catch (err) {
-    //   console.log(`\n\n[nintendo/en-us]\n${err}\n\n`);
-    // }
-
-    // try {
-    //   await nintendoJp(browser).catch((err) => console.log(`\n\n[nintendo/ja-jp]\n${err}\n\n`));
-    // } catch (err) {
-    //   console.log(`\n\n[nintendo/ja-jp]\n${err}\n\n`);
-    // }
-
-    // try {
-    //   await xbox(browser, "en-gb").catch((err) => console.log(`\n\n[xbox/en-gb]\n${err}\n\n`));
-    // } catch (err) {
-    //   console.log(`\n\n[xbox/en-gb]\n${err}\n\n`);
-    // }
-
-    // try {
-    //   await xbox(browser, "en-us").catch((err) => console.log(`\n\n[xbox/en-us]\n${err}\n\n`));
-    // } catch (err) {
-    //   console.log(`\n\n[xbox/en-us]\n${err}\n\n`);
-    // }
-
-    // try {
-    //   await xbox(browser, "ja-jp").catch((err) => console.log(`\n\n[xbox/ja-jp]\n${err}\n\n`));
-    // } catch (err) {
-    //   console.log(`\n\n[xbox/ja-jp]\n${err}\n\n`);
-    // }
-
-    // try {
-    //   await playstation(browser, "en-gb").catch((err) => console.log(`\n\n[playstation/en-gb]\n${err}\n\n`));
-    // } catch (err) {
-    //   console.log(`\n\n[playstation/en-gb]\n${err}\n\n`);
-    // }
-
     try {
-      await playstation(browser, "en-us").catch((err) => console.log(`\n\n[playstation/en-us]\n${err}\n\n`));
+      await nintendoGb(browser).catch((err) => console.log(`\n\n[nintendo/en-gb]\n${err}\n\n`));
     } catch (err) {
-      console.log(`\n\n[playstation/en-us]\n${err}\n\n`);
+      console.log(`\n\n[nintendo/en-gb)]\n${err}\n\n`);
     }
 
     try {
-      await playstation(browser, "ja-jp").catch((err) => console.log(`\n\n[playstation/ja-jp]\n${err}\n\n`));
+      await nintendoUs(browser).catch((err) => console.log(`\n\n[nintendo/en-us]\n${err}\n\n`));
     } catch (err) {
-      console.log(`\n\n[playstation/ja-jp]\n${err}\n\n`);
+      console.log(`\n\n[nintendo/en-us]\n${err}\n\n`);
+    }
+
+    try {
+      await nintendoJp(browser).catch((err) => console.log(`\n\n[nintendo/ja-jp]\n${err}\n\n`));
+    } catch (err) {
+      console.log(`\n\n[nintendo/ja-jp]\n${err}\n\n`);
+    }
+
+    try {
+      await xbox(browser, "en-gb").catch((err) => console.log(`\n\n[xbox/en-gb]\n${err}\n\n`));
+    } catch (err) {
+      console.log(`\n\n[xbox/en-gb]\n${err}\n\n`);
+    }
+
+    try {
+      await xbox(browser, "en-us").catch((err) => console.log(`\n\n[xbox/en-us]\n${err}\n\n`));
+    } catch (err) {
+      console.log(`\n\n[xbox/en-us]\n${err}\n\n`);
+    }
+
+    try {
+      await xbox(browser, "ja-jp").catch((err) => console.log(`\n\n[xbox/ja-jp]\n${err}\n\n`));
+    } catch (err) {
+      console.log(`\n\n[xbox/ja-jp]\n${err}\n\n`);
     }
 
     await browser.close();

@@ -37,26 +37,16 @@ app.get("/api/search", async (req, res) => {
   const _games: BasicInfo[] = [];
 
   if (site && !locale) {
-    let com: JsonFile = { games: [] };
-    let gb: JsonFile = { games: [] };
-    let us: JsonFile = { games: [] };
-
     const jp = await getJson(site as Site, "ja-jp");
+    const gb = await getJson(site as Site, "en-gb");
+    const us = await getJson(site as Site, "en-us");
 
-    if (site === "nintendo") {
-      com = await getJson(site, "en-(gb+us)");
-    } else {
-      gb = await getJson(site as Site, "en-gb");
-      us = await getJson(site as Site, "en-us");
-    }
-
-    _games.push(...jp.games.concat(com.games, gb.games, us.games));
+    _games.push(...jp.games.concat(gb.games, us.games));
   } else if (!site && locale) {
     const xbox = await getJson("xbox", locale as Locale);
-    const playstation = await getJson("playstation", locale as Locale);
     const nintendo = await getJson("nintendo", locale as Locale);
 
-    _games.push(...xbox.games.concat(playstation.games, nintendo.games));
+    _games.push(...xbox.games.concat(nintendo.games));
   } else if (site && locale) {
     _games.push(...(await getJson(site as Site, locale as Locale)).games);
   } else {
@@ -78,7 +68,7 @@ app.get("/api/search", async (req, res) => {
 app.get("/api/:site", async (req, res) => {
   const { site } = req.params as Record<string, string>;
 
-  if (!["xbox", "nintendo", "playstation"].includes(site)) return res.status(400).json({ error: "Invalid 'site' param" });
+  if (!["xbox", "nintendo"].includes(site)) return res.status(400).json({ error: "Invalid 'site' param" });
 
   const { games } = await getJson(site as Site);
   res.status(200).json({ amount: games.length, games });
@@ -87,7 +77,7 @@ app.get("/api/:site", async (req, res) => {
 app.get("/api/:site/:locale", async (req, res) => {
   const { site, locale } = req.params as Record<string, string>;
 
-  if (!["xbox", "nintendo", "playstation"].includes(site)) return res.status(400).json({ error: "Invalid 'site' param" });
+  if (!["xbox", "nintendo"].includes(site)) return res.status(400).json({ error: "Invalid 'site' param" });
   if (!["en-gb", "en-us", "ja-jp"].includes(locale)) return res.status(400).json({ error: "Invalid 'locale' param" });
 
   const { games } = await getJson(site as Site, locale as Locale);

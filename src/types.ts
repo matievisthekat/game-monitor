@@ -1,5 +1,5 @@
-export type Locale = "en-gb" | "en-us" | "ja-jp" | "en-(gb+us)";
-export type Site = "nintendo" | "xbox" | "playstation";
+export type Locale = "en-gb" | "en-us" | "ja-jp";
+export type Site = "nintendo" | "xbox";
 export type Availability = "available" | "unavailable" | "unknown";
 
 export interface Game {

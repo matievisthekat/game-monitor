@@ -11,64 +11,40 @@ export function removeDuplicates(games: BasicInfo[]) {
 
 export function checkSiteAndLocale(site?: string, locale?: string) {
   if (locale && !["en-gb", "en-us", "ja-jp"].includes(locale)) return "Invalid 'locale' param";
-  if (site && !["nintendo", "xbox", "playstation"].includes(site)) return "Invalid 'site' param";
-  if (site !== "nintendo" && locale === "en-(gb+us)") return "Locale 'en-(gb+us)' is only available for Nintendo";
+  if (site && !["nintendo", "xbox"].includes(site)) return "Invalid 'site' param";
 }
 
 export async function getALlJson() {
+  const nintendoGb = await getJson("nintendo", "en-gb");
+  const nintendoUs = await getJson("nintendo", "en-us");
   const nintendoJp = await getJson("nintendo", "ja-jp");
-  const nintendoCom = await getJson("nintendo", "en-(gb+us)");
   const xboxGb = await getJson("xbox", "en-gb");
   const xboxUs = await getJson("xbox", "en-us");
   const xboxJp = await getJson("xbox", "ja-jp");
-  const playstationGb = await getJson("playstation", "en-gb");
-  const playstationUs = await getJson("playstation", "en-us");
-  const playStationJp = await getJson("playstation", "ja-jp");
 
   return {
-    games: nintendoJp.games.concat(
-      nintendoCom.games,
-      xboxGb.games,
-      xboxUs.games,
-      xboxJp.games,
-      playstationGb.games,
-      playstationUs.games,
-      playStationJp.games
-    ),
+    games: nintendoJp.games.concat(nintendoGb.games, nintendoUs.games, xboxGb.games, xboxUs.games, xboxJp.games),
   };
 }
 
 export function getJson(site: Site, locale?: Locale) {
   return new Promise<JsonFile>(async (resolve) => {
-    if (site === "nintendo" && (locale === "en-gb" || locale === "en-us")) locale = "en-(gb+us)";
-
     if (locale) {
       const json = join(publicDir, site, `${locale}.json`);
       readJSON(json)
         .then((data) => resolve(data))
         .catch(() => resolve({ games: [] }));
     } else {
-      if (site === "nintendo") {
-        const games: Game[] = [];
-        const en = join(publicDir, "nintendo", "en-(gb+us).json");
-        const jp = join(publicDir, "nintendo", "ja-jp.json");
+      const games: Game[] = [];
+      const gb = join(publicDir, site, "en-gb.json");
+      const us = join(publicDir, site, "en-us.json");
+      const jp = join(publicDir, site, "ja-jp.json");
 
-        await readJSON(en).then((data) => games.push(...data.games));
-        await readJSON(jp).then((data) => games.push(...data.games));
+      await readJSON(gb).then((data) => games.push(...data.games));
+      await readJSON(us).then((data) => games.push(...data.games));
+      await readJSON(jp).then((data) => games.push(...data.games));
 
-        resolve({ games });
-      } else {
-        const games: Game[] = [];
-        const gb = join(publicDir, site, "en-gb.json");
-        const us = join(publicDir, site, "en-us.json");
-        const jp = join(publicDir, site, "ja-jp.json");
-
-        await readJSON(gb).then((data) => games.push(...data.games));
-        await readJSON(us).then((data) => games.push(...data.games));
-        await readJSON(jp).then((data) => games.push(...data.games));
-
-        resolve({ games });
-      }
+      resolve({ games });
     }
   });
 }
