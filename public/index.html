@@ -64,7 +64,7 @@
               if (res.status === 200) {
                 results.innerHTML = "";
 
-                for (const game of data) {
+                for (const game of data.sort((a, b) => b.score - a.score)) {
                   results.innerHTML += `
                     <a href="${game.url}" target="_blank">
                       <div class="shadow-xl rounded bg-gray-400 m-3 pb-1 max-h-100 max-w-50 row-span-1 col-span-1 overflow-auto">
@@ -75,6 +75,8 @@
                     </a>
                   `;
                 }
+
+                if (data.length < 1) results.innerHTML = '<div class="col-span-6 text-red-500">No results</div>';
               } else {
                 error.textContent = "Request failed";
               }

@@ -1,5 +1,5 @@
 import express from "express";
-import { go } from "fuzzysort";
+import MiniSearch from "minisearch";
 import { BasicInfo, JsonFile, Locale, Site } from "./types";
 import { checkSiteAndLocale, getALlJson, getJson, publicDir, removeDuplicates } from "./util";
 
@@ -25,9 +25,9 @@ app.get("/api/unavailable", async (req, res) => {
 app.get("/api/search", async (req, res) => {
   const { site: _site, locale: _locale, q: _q } = req.query;
 
-  const site = Array.isArray(_site) ? _site.join(" ") : (_site as string);
-  const locale = Array.isArray(_locale) ? _locale.join(" ") : (_locale as string);
-  const q = Array.isArray(_q) ? _q.join(" ") : (_q as string);
+  const site = _site as string;
+  const locale = _locale as string;
+  const q = _q as string;
 
   if (!q) return res.status(400).json({ error: "Query 'q' was not provided" });
 
@@ -55,14 +55,17 @@ app.get("/api/search", async (req, res) => {
 
   const _gamesClean = _games.filter((g) => !!g);
   const games = removeDuplicates(_gamesClean);
-  const names = games.map((g) => g.name);
-  const results = go(q, [...new Set(names)])
-    .concat([])
-    .sort((a, b) => b.score - a.score);
+  const gamesWithId = games.map((g, id) => Object.assign(g, { id }));
 
-  res
-    .status(200)
-    .json(results.map((r) => Object.assign(games.find((g) => g.name === r.target) as BasicInfo, { score: r.score })));
+  const mini = new MiniSearch({
+    fields: ["name"],
+    storeFields: ["name", "availability", "img", "url"],
+  });
+
+  mini.addAll(gamesWithId);
+  const results = mini.search(q, { fuzzy: 0.2 });
+
+  res.status(200).json(results);
 });
 
 app.get("/api/:site", async (req, res) => {

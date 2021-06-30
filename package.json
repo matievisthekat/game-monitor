@@ -15,7 +15,7 @@
     "cron": "^1.8.2",
     "express": "^4.17.1",
     "fs-extra": "^10.0.0",
-    "fuzzysort": "^1.1.4",
+    "minisearch": "^3.0.4",
     "proxy-chain": "^1.0.2",
     "puppeteer": "^10.0.0",
     "string-similarity": "^4.0.4"
