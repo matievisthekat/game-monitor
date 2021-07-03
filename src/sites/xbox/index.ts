@@ -68,7 +68,7 @@ export default async function (browser: Browser, locale: Locale) {
   }
 
   await page.close();
-  const manager = new TaskManager(5);
+  const manager = new TaskManager(1);
   const basicInfo = [...new Set(_basicInfo)];
   // await write(json, { basicInfo });
   const games: Game[] = [];

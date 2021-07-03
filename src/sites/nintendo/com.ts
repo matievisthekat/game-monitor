@@ -40,7 +40,7 @@ const genreFilters = [
 ];
 
 export default async function (browser: Browser) {
-  const manager = new TaskManager(10);
+  const manager = new TaskManager(1);
   const _basicInfo: BasicInfo[] = [];
 
   console.log("[nintendo/en-us] Fetching game urls...");
@@ -94,7 +94,6 @@ export default async function (browser: Browser) {
   );
 
   bar.start(basicInfo.length, 0);
-
   for (const { url, name, img } of basicInfo) {
     manager.addTask(() => {
       return new Promise<void>(async (resolve) => {

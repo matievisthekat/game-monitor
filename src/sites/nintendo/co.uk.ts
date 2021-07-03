@@ -10,7 +10,7 @@ const url = "https://www.nintendo.co.uk/Search/Search-299117.html?f=147394-89";
 
 export default async function (browser: Browser) {
   const page = await browser.newPage();
-  const manager = new TaskManager(5);
+  const manager = new TaskManager(1);
   const _basicInfo: BasicInfo[] = [];
 
   console.log("[nintendo/en-gb] Fetching game urls...");

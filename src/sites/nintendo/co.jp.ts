@@ -10,7 +10,7 @@ const url = "https://www.nintendo.co.jp/software/switch/index.html?sftab=all&sfs
 
 export default async function (browser: Browser) {
   const page = await browser.newPage();
-  const manager = new TaskManager(5);
+  const manager = new TaskManager(1);
   const _basicInfo: BasicInfo[] = [];
 
   console.log("[nintendo/ja-jp] Fetching game urls...");
