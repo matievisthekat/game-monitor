@@ -11,15 +11,14 @@ import xbox from "./sites/xbox/index";
 import { publicDir, TaskManager } from "./util";
 import "./api";
 
-// const job = new CronJob("0 1 * * *", async () => await run(), null, false, "Europe/London");
-// job.start();
-// run();
+const job = new CronJob("0 0 * * 0", async () => await run(), null, false, "Europe/London");
+job.start();
 
 async function run() {
   const width = 1119;
   const height = 669;
 
-  const tasks = new TaskManager(3);
+  const tasks = new TaskManager(2);
 
   await mkdir(publicDir).catch(() => {});
 
