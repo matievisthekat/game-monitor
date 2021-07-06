@@ -86,7 +86,6 @@ export default async function (browser: Browser) {
 
   await manager.runAll();
   const basicInfo = [...new Set(_basicInfo)];
-  // await write(json, { basicInfo });
   const games: Game[] = [];
   const bar = new SingleBar(
     { format: "[nintendo/en-us] [{bar}] {percentage}% ({value}/{total}) | ETA {eta_formatted}", etaBuffer: 100 },

@@ -70,7 +70,6 @@ export default async function (browser: Browser, locale: Locale) {
   await page.close();
   const manager = new TaskManager(1);
   const basicInfo = [...new Set(_basicInfo)];
-  // await write(json, { basicInfo });
   const games: Game[] = [];
   const bar = new SingleBar(
     { format: `[xbox/${locale}] [{bar}] {percentage}% ({value}/{total}) | ETA {eta_formatted}`, etaBuffer: 100 },
