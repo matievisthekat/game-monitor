@@ -36,7 +36,7 @@ The project is now ready to run.
 - If you want to make sure it works:
   - Run `yarn start`
   - The output should end with `[api] Listening on port 3000`
- - If you want to run it in the background: (recommended)
+- If you want to run it in the background: (recommended)
   - Run `pm2 start`
   - Run `pm2 logs 0`
   - The output should end with `[api] Listening on port 3000`
