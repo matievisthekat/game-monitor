@@ -2,7 +2,7 @@
   
   # Game Monitor
 
-  This project monitors game availability on Xbox, Playstation, and Nintendo sites (United States, Europe, Japan)
+  This project monitors game availability on Xbox and Nintendo sites (United States, Europe, Japan)
   
 </div>
 
