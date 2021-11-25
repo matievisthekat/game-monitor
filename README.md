@@ -1,8 +1,14 @@
-# Game Monitor
+<div align="center">
+  
+  # Game Monitor
 
-This project monitors game availability on Xbox, Playstation, and Nintendo sites (United States, Europe, Japan)
+  This project monitors game availability on Xbox, Playstation, and Nintendo sites (United States, Europe, Japan)
+  
+</div>
 
-# Setup Instructions
+---
+
+## Setup Instructions
 
 - *Note: you will need ~4GB of RAM and ~4 CPU cores to run this program efficiently*
 - *Tip: any time you get a 'permission denied' error when running a command, try running the command again with `sudo` in front of it*
