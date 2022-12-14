@@ -13,7 +13,7 @@
     "@types/fs-extra": "^9.0.11",
     "cli-progress": "^3.9.0",
     "cron": "^1.8.2",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "fs-extra": "^10.0.0",
     "minisearch": "^3.0.4",
     "proxy-chain": "^1.0.2",
