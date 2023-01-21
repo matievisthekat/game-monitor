@@ -4,6 +4,8 @@
 
   This project monitors game availability on Xbox and Nintendo sites (United States, Europe, Japan)
   
+  **:warning: this repository has been archived. if you want this project to be maintained please contact `matievisthekat@gmail.com` or fork this repo :warning:**
+  
 </div>
 
 ---
